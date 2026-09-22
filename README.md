@@ -4,105 +4,111 @@
 
 ---
 
-## 🇮🇳 हिंदी में निर्देश: GitHub पर अपलोड करने और "White Screen" ठीक करने की पूरी जानकारी
+## 📖 English Guide: GitHub Upload & GitHub Pages Deployment
 
-### ❓ आपकी समस्याएँ क्या थीं और उन्हें कैसे ठीक किया गया?
+### ❓ What Caused the Issues & How They Were Resolved
 
-1. **White Screen (सफेद स्क्रीन) क्यों आ रही थी?**
-   - **कारण 1**: Vite का डिफ़ॉल्ट एसेट पाथ `base: '/'` था। जब आप GitHub Pages या किसी सब-फ़ोल्डर पर होस्ट करते हैं, तो ब्राउज़र `/assets/...` ढूँढता है जो 404 Not Found देता है। इससे स्क्रीन एकदम **खाली सफेद (White Screen)** हो जाती थी।
-   - **समाधान**: हमने `vite.config.ts` में `base: './'` (रिलेटिव पाथ) सेट कर दिया है। अब यह हर जगह (GitHub Pages, Vercel, Localhost) बिना किसी 404 एरर के लोड होगा।
-   - **कारण 2**: Leaflet Map का री-माउंट एरर (`Map container is already initialized`).
-   - **समाधान**: हमने `InteractiveMap.tsx` में सेफ-गार्ड कोड जोड़ दिया है और पूरे ऐप को `ErrorBoundary` से सुरक्षित कर दिया है ताकि कभी भी ऐप क्रैश न हो।
+1. **Why Did a Blank White Screen Occur?**
+   - **Root Cause 1**: Vite's default build asset path was `/` (absolute). When hosted on GitHub Pages (e.g., `https://<username>.github.io/<repo-name>/`), the browser requested `/assets/...` from the root domain instead of the project subfolder. This caused `404 Not Found` for CSS and JavaScript files, rendering a **completely blank white screen**.
+   - **Resolution**: Updated `vite.config.ts` to `base: './'` (relative paths). Assets now resolve accurately across GitHub Pages, Vercel, Netlify, or local environments without 404 errors.
+   - **Root Cause 2**: Leaflet map remount exception (`Map container is already initialized`).
+   - **Resolution**: Added a safeguard in `InteractiveMap.tsx` to clear residual map references before re-mounting, and wrapped the entire React application with an `ErrorBoundary` to gracefully handle unexpected runtime errors.
 
-2. **GitHub पर अपलोड करते समय 26 फाइलों और एरर का कारण:**
-   - जब आप GitHub की वेबसाइट पर जाकर डायरेक्ट फ़ोल्डर ड्रैग & ड्रॉप करते हैं, तो अगर उसमें `node_modules` शामिल हो जाता है, तो GitHub **"fewer than 100 files at a time"** एरर देता है।
-   - `node_modules` फ़ोल्डर को कभी भी GitHub पर अपलोड **नहीं** करना होता है (यह `.gitignore` में पहले से शामिल है)।
-   - आपको केवल सोर्स कोड (Source Code) पुश करना होता है।
-
----
-
-### 🚀 GitHub पर अपलोड करने के 3 आसान तरीके (Three Simple Methods)
-
-#### ✅ तरीका 1: Google AI Studio से सीधे 1-क्लिक एक्सपोर्ट (सबसे आसान)
-1. स्क्रीन के ऊपर दायें कोने (Top-Right Corner) में **तीन बिंदु (`⋮`)** या **Settings** पर क्लिक करें।
-2. **"Export to GitHub"** (या **"Push to GitHub"**) चुनें।
-3. अपने GitHub अकाउंट (`ommishrakings`) को अनुमति (Authorize) दें।
-4. नया रिपॉजिटरी नाम डालें (जैसे `ner-logismart`) और **Confirm** दबाएं।
-5. आपका पूरा कोड अपने आप साफ़-सुथरे तरीके से GitHub पर चला जाएगा!
+2. **Why Did Upload Errors Occur on GitHub (the 26 Files Issue)?**
+   - When attempting to upload the project folder directly through the GitHub web UI, dragging files often includes the `node_modules` directory, triggering GitHub's **"fewer than 100 files at a time"** limit.
+   - Heavy dependencies in `node_modules` must not be uploaded manually. The repository's `.gitignore` file now cleanly excludes `node_modules`, `dist`, and environment caches, leaving a clean, lean set of source files ready for Git.
 
 ---
 
-#### ✅ तरीका 2: Git कमांड्स द्वारा (Terminal / Command Prompt से)
+### 🚀 3 Easy Methods to Upload to GitHub
 
-यदि आपने कोड ZIP के रूप में डाउनलोड किया है:
-1. ZIP फ़ाइल को अपने कंप्यूटर पर एक्सट्रेक्ट (Unzip) करें।
-2. उस फ़ोल्डर में जाकर Terminal या CMD खोलें और ये 5 कमांड्स चलाएँ:
+#### ✅ Method 1: 1-Click Export directly from AI Studio (Recommended)
+1. In the **top-right corner of AI Studio**, click the **three dots menu (`⋮`)** or the **Settings** icon.
+2. Select **"Export to GitHub"** (or **"Push to GitHub"**).
+3. Authorize your GitHub account (`ommishrakings`) if prompted.
+4. Enter a repository name (such as `ner-logismart`) and click **Confirm / Export**.
+5. AI Studio will automatically push the repository directly to your GitHub account.
+
+---
+
+#### ✅ Method 2: Command Line (Git CLI)
+If you downloaded the code as a ZIP archive:
+1. Extract (unzip) the file on your local machine.
+2. Open a Terminal or Command Prompt in that extracted directory.
+3. Run the following commands:
 
 ```bash
-# 1. गिट इनिशियलाइज़ करें
+# 1. Initialize local Git repository
 git init
 
-# 2. सभी फाइलों को स्टेज करें (node_modules अपने आप इग्नोर हो जाएगा)
+# 2. Stage all project files (node_modules is automatically ignored)
 git add .
 
-# 3. कमिट करें
+# 3. Create your initial commit
 git commit -m "feat: NER-LogiSmart production ready codebase"
 
-# 4. मेन ब्रांच सेट करें
+# 4. Set default branch to main
 git branch -M main
 
-# 5. अपने गिटहब रिपॉजिटरी का लिंक जोड़ें (GitHub पर नया repo बनाकर URL यहाँ डालें)
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+# 5. Link your GitHub remote repository (create one at github.com/new first)
+git remote add origin https://github.com/ommishrakings/ner-logismart.git
 
-# 6. गिटहब पर पुश करें
+# 6. Push to GitHub
 git push -u origin main
 ```
+*(Replace `ommishrakings/ner-logismart` with your actual repository URL)*
 
 ---
 
-#### ✅ तरीका 3: GitHub Desktop ऐप से (No Terminal Required)
-1. **GitHub Desktop** सॉफ्टवेयर खोलें।
-2. `File` > `Add Local Repository` पर क्लिक करें।
-3. एक्सट्रेक्ट किए गए फ़ोल्डर को चुनें।
-4. `Publish repository` बटन दबाएं।
+#### ✅ Method 3: GitHub Desktop (Graphical User Interface)
+1. Open **GitHub Desktop**.
+2. Select `File` ➔ `Add Local Repository` and browse to your project folder.
+3. Click the **"Publish repository"** button in the top right.
 
 ---
 
-### 🌐 GitHub Pages पर लाइव कैसे चलाएं (Free Hosting)?
+### 🌐 Deploying to GitHub Pages (Live Working Web Link)
 
-हमने इस प्रोजेक्ट में `.github/workflows/deploy.yml` जोड़ दिया है:
-1. कोड GitHub पर पुश करने के बाद, अपने GitHub Repo में जाएं।
-2. **Settings** > **Pages** पर क्लिक करें।
-3. **Build and deployment** > **Source** में **GitHub Actions** चुनें।
-4. 1-2 मिनट में आपकी वेबसाइट लाइव हो जाएगी और कोई भी White Screen नहीं आएगी!
+An automated deployment pipeline is included in `.github/workflows/deploy.yml`:
+
+1. Push your code to GitHub following any of the methods above.
+2. In your GitHub repository, open **Settings** ➔ **Pages** (in the left sidebar).
+3. Under **Build and deployment** ➔ **Source**, select **GitHub Actions**.
+4. GitHub will trigger the workflow automatically. Within 1–2 minutes, your live website will be accessible at:
+   ```
+   https://ommishrakings.github.io/ner-logismart/
+   ```
+5. Because relative asset paths (`base: './'`) and client-side failover logic are configured, the web application will load immediately with **zero white-screen errors**.
 
 ---
 
-## 💻 अपने कंप्यूटर (Localhost) पर कैसे चलाएं?
+## 💻 Running Locally
+
+To run the application on your computer:
 
 ```bash
-# 1. सभी डिपेंडेंसी इंस्टॉल करें
+# 1. Install dependencies
 npm install
 
-# 2. डेवलपमेंट सर्वर शुरू करें (Port 3000)
+# 2. Start the development server (runs on Port 3000)
 npm run dev
 
-# 3. प्रोडक्शन बिल्ड चेक करने के लिए
+# 3. Test production compilation
 npm run build
 ```
 
-ब्राउज़र में खोलें: `http://localhost:3000`
+Open your browser and navigate to: `http://localhost:3000`
 
 ---
 
-## ✨ Features Included
+## 🌟 Key Application Capabilities
 
-- 🗺️ **Full Interactive North East & Pan-India Routing Map**: Real-time Leaflet map covering all 8 North East states (Assam, Meghalaya, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Sikkim) plus Pan-India corridors from Kolkata, Delhi, Mumbai, Bengaluru, and Patna.
-- 🚧 **Dynamic Mountain Bypass Routing**: Automated recalculation around Sonapur, Paglapahar, and Dzukou landslides with elevation, time delay, and slope risk ratings.
-- 📸 **Live Incident Camera & Vision AI**: Take photos of road blockages with automatic GPS geolocation and AI validation.
-- 🤖 **AI Route Advisor**: Terrain risk analysis, Inner Line Permit (ILP) checks, fuel stops, and BRO road clearance updates.
-- 🌾 **MSME & Agro-Logistics Hubs**: Mandi pricing and cold-chain freight economics for Lakadong Turmeric, Naga King Chilli, Queen Pineapple, etc.
-- 🛡️ **Zero White-Screen Architecture**: Protected by React ErrorBoundary and universal relative asset resolution (`base: './'`).
+- 🗺️ **Comprehensive North East & Pan-India Routing**: Real-time Leaflet map covering all 8 North Eastern states (Assam, Meghalaya, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Sikkim) plus Pan-India arterial routes from Kolkata, Delhi, Mumbai, Bengaluru, and Patna.
+- 🚧 **Dynamic Mountain Bypass Routing**: Automated bypass routing for Sonapur, Paglapahar, and Dzukou hazards with elevation profiles, delay estimates, and road conditions.
+- 📸 **Live Incident Camera**: Geolocation snapping, highway tagging, and vision verification for road hazard submissions.
+- 🤖 **AI Route Advisor**: Mountain driving advisories, Inner Line Permit (ILP) guidance, fuel stops, and BRO road clearance updates.
+- 🌾 **MSME & Agro Mandi Logistics**: Real-time trade pricing and cold-chain freight guidance for regional produce.
+- 🛡️ **Zero White-Screen Architecture**: Guarded by a dedicated React `ErrorBoundary` and universal relative asset resolution (`base: './'`).
 
 ---
 

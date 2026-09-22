@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Info
 } from "lucide-react";
+import { generateClientSearchAdvisory } from "../utils/autonomousAiAdvisor";
 
 export interface RouteContextData {
   origin?: string;
@@ -114,13 +115,25 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         vehicleType: "10-wheel Heavy Freight Carrier",
       };
 
-      const res = await fetch("/api/ai/search-advisor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      let data: any = null;
+      try {
+        const res = await fetch("/api/ai/search-advisor", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (e) {
+        console.info("Using autonomous client advisor for GitHub Pages / static hosting");
+      }
 
-      const data = await res.json();
+      // If backend was unreachable or returned error, use client-side mountain intelligence
+      if (!data) {
+        data = generateClientSearchAdvisory(payload);
+      }
+
       if (data.aiEngine) {
         setEngineStatus(data.aiEngine);
       }
@@ -145,10 +158,16 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
       setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
       console.error("AI assistant error:", error);
+      const fallbackAdvisory = generateClientSearchAdvisory({
+        query: textToSend,
+        origin: routeContext?.origin,
+        destination: routeContext?.destination,
+      });
       const fallbackMsg: Message = {
         role: "assistant",
-        text: "The primary mountain corridor route has active weather and terrain advisories. For NH-6 Sonapur, divert via SH-12 Khanduli. For NH-29 Paglapahar, divert via Niuland-Zubza road. Ensure vehicle carries valid Form 38 Hill Route Fitness and Commercial ILP clearances.",
+        text: fallbackAdvisory.summary,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        data: fallbackAdvisory,
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
