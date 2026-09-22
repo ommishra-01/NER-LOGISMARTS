@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/* Leaflet Container & Map Layout Fixes */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  font-family: inherit;
+}
+
+/* Pulsing animated markers for Landslides & Flash Floods */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.pulsing-hazard-circle {
+  position: relative;
+}
+
+.pulsing-hazard-circle::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 9999px;
+  border: 3px solid currentColor;
+  animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* Dashed route animations */
+@keyframes dash-animation {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.animated-bypass-polyline {
+  stroke-dasharray: 8, 8;
+  animation: dash-animation 2s linear infinite;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}

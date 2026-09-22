@@ -1,0 +1,6 @@
+{
+  "name": "NER-LogiSmart: North East Logistics & Accessibility Platform",
+  "description": "AI-powered smart logistics, emergency accessibility, and mountain corridor intelligence platform for the North Eastern Region of India.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
