@@ -31,7 +31,15 @@ export const BroadcastAlertBanner: React.FC<BroadcastAlertBannerProps> = ({
     if (!alert) return;
 
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const audioCtx = new AudioCtx();
+      if (audioCtx.state === "suspended") {
+        // Do not force resume without user gesture
+        audioCtx.close().catch(() => {});
+        return;
+      }
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 

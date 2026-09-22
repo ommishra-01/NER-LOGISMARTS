@@ -54,25 +54,32 @@ export default function App() {
   const [selectedHazard, setSelectedHazard] = useState<RoadHazard | null>(NER_ROAD_HAZARDS[0]);
   const [selectedCluster, setSelectedCluster] = useState<MSMEFarmerCluster | null>(NER_FARMER_MSME_CLUSTERS[0]);
 
-  // Fetch initial hazards from backend
+  // Fetch initial hazards from backend (with silent fallback to static NER dataset for GitHub Pages)
   useEffect(() => {
     fetch("/api/hazards")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
       .then((data) => {
-        if (data.hazards && Array.isArray(data.hazards) && data.hazards.length > 0) {
+        if (data && data.hazards && Array.isArray(data.hazards) && data.hazards.length > 0) {
           setHazards(data.hazards);
         }
       })
-      .catch((err) => console.error("Error fetching hazards:", err));
+      .catch(() => {
+        // Quietly maintain static NER dataset on GitHub Pages / offline hosting
+      });
   }, []);
 
   const handleHazardReported = (newHazard: RoadHazard) => {
-    // Send to backend API asynchronously to persist
+    // Send to backend API asynchronously to persist if backend exists
     fetch("/api/hazards/report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newHazard),
-    }).catch((err) => console.error("Error saving hazard to backend:", err));
+    }).catch(() => {
+      // Local state is already updated; silently continue on static hosting
+    });
 
     setHazards((prev) => [newHazard, ...prev.filter((h) => h.id !== newHazard.id)]);
 

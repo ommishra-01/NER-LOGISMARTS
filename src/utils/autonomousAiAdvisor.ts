@@ -138,3 +138,77 @@ export function generateClientSearchAdvisory(context: RouteSearchContext): AiSea
     aiEngine: "Autonomous Client Mountain AI"
   };
 }
+
+export interface ClientEconomicImpactResponse {
+  summary: string;
+  freightSharePercent: number;
+  farmerNetMargin: string;
+  accessibilityImpact: string;
+  keyRecommendations: string[];
+}
+
+export function generateClientEconomicImpact(params: {
+  produceName?: string;
+  farmerLocation?: string;
+  targetMarket?: string;
+  roadCondition?: string;
+  transportCostPerKm?: string;
+}): ClientEconomicImpactResponse {
+  const produce = params.produceName || "Horticultural produce";
+  return {
+    summary: `Transport bottlenecks along mountain corridors account for up to 32% of final produce cost, directly diminishing farmer realizations for ${produce}.`,
+    freightSharePercent: 28.5,
+    farmerNetMargin: "₹42 / kg out of ₹65 / kg market price",
+    accessibilityImpact: "A direct highway bypass reduces transit spoilage of perishables from 14% to under 3%, saving MSMEs over ₹1.8 Lakh per consignment.",
+    keyRecommendations: [
+      "Consolidate loads at regional FPO (Farmer Producer Org) cold aggregation hubs",
+      "Utilize off-peak night transit on National Highway 27 for flat terrain portions",
+      "Apply for PM-DevINE subsidized agro-logistics cold-chain reefer trucks",
+    ],
+  };
+}
+
+export interface ClientPermitAssistantResponse {
+  requiredPermits: string[];
+  entryCheckposts: string[];
+  paperworkChecklist: string[];
+  complianceNotes: string;
+  aiEngine?: string;
+}
+
+export function generateClientPermitAssistant(params: {
+  destinationState?: string;
+  vehicleCategory?: string;
+  cargoCategory?: string;
+  driverLicenseState?: string;
+}): ClientPermitAssistantResponse {
+  const dest = params.destinationState || "Arunachal Pradesh";
+  const isIlpState = ["Arunachal Pradesh", "Nagaland", "Mizoram", "Manipur"].includes(dest);
+
+  return {
+    requiredPermits: [
+      "National Goods Carriage Permit (Form 23 / 48)",
+      "Interstate Commercial Transit E-Way Bill (with RFID QR)",
+      isIlpState ? `${dest} Inner Line Permit (e-ILP) for Driver & Helper` : "Standard Commercial Border Entry Slip",
+      "Hill Route Vehicle Mechanical Fitness Certificate (Form 38)",
+    ],
+    entryCheckposts: [
+      dest === "Arunachal Pradesh" ? "Banderdewa / Hollongi Gate" :
+      dest === "Nagaland" ? "New Field Checkpost, Dimapur" :
+      dest === "Mizoram" ? "Vairengte Interstate Border Post" :
+      dest === "Meghalaya" ? "Byrnihat Commercial Toll Gate" :
+      "Srirampur Border Inter-State Gateway",
+    ],
+    paperworkChecklist: [
+      "Commercial Heavy Vehicle Driving License with Mountain Hill Endorsement",
+      "Valid Fastag RFID Tag with adequate corridor toll balance",
+      "Consignor & Consignee GST Invoices & Bilty (Lorry Receipt)",
+      "Pollution Under Control (PUC) & Speed Governor Calibration Slip",
+    ],
+    complianceNotes: isIlpState
+      ? `MANDATORY: ${dest} strictly requires electronic Inner Line Permits (e-ILP) for transit crew. Verify portal approval prior to border check gate.`
+      : "Standard commercial inspection with automated E-Way Bill RFID gate scanning.",
+    aiEngine: "Autonomous Client Mountain Regulatory AI",
+  };
+}
+

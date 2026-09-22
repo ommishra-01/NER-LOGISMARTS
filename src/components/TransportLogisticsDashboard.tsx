@@ -7,6 +7,10 @@ import {
 } from "../data/nerData";
 import { MSMEFarmerCluster, RoadHazard, TransitPermit } from "../types";
 import { 
+  generateClientEconomicImpact, 
+  generateClientPermitAssistant 
+} from "../utils/autonomousAiAdvisor";
+import { 
   Building2, 
   Wheat, 
   TrendingUp, 
@@ -73,54 +77,68 @@ export const TransportLogisticsDashboard: React.FC<TransportLogisticsDashboardPr
     "Mizoram",
   ];
 
-  // Trigger server-side AI Economic Impact analysis
+  // Trigger server-side AI Economic Impact analysis with client fallback for GitHub Pages
   const runAiEconomicAnalysis = async (cluster: MSMEFarmerCluster) => {
     setIsCalculatingAiEcon(true);
     setAiEconResult(null);
+
+    const payload = {
+      produceName: cluster.produceName,
+      farmerLocation: `${cluster.district}, ${cluster.state}`,
+      targetMarket: cluster.primaryMarket,
+      roadCondition: "Mountain hairpins, seasonal landslide delay",
+      transportCostPerKm: `₹${cluster.transportCostPerKmPerTon} per ton-km`,
+    };
 
     try {
       const response = await fetch("/api/ai/economic-impact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          produceName: cluster.produceName,
-          farmerLocation: `${cluster.district}, ${cluster.state}`,
-          targetMarket: cluster.primaryMarket,
-          roadCondition: "Mountain hairpins, seasonal landslide delay",
-          transportCostPerKm: `₹${cluster.transportCostPerKmPerTon} per ton-km`,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      setAiEconResult(data);
-    } catch (err) {
-      console.error("AI econ calculation error:", err);
+      if (response.ok) {
+        const data = await response.json();
+        setAiEconResult(data);
+      } else {
+        setAiEconResult(generateClientEconomicImpact(payload));
+      }
+    } catch {
+      // Graceful fallback for static hosting / GitHub Pages
+      setAiEconResult(generateClientEconomicImpact(payload));
     } finally {
       setIsCalculatingAiEcon(false);
     }
   };
 
-  // Trigger server-side AI Permit Assistant
+  // Trigger server-side AI Permit Assistant with client fallback for GitHub Pages
   const runAiPermitCheck = async () => {
     setIsCheckingPermits(true);
     setAiPermitResult(null);
+
+    const payload = {
+      destinationState: permitDestState,
+      vehicleCategory: "10-wheel Heavy Freight Multi-Axle",
+      cargoCategory: "High Value Agro-Perishables & MSME Goods",
+      driverLicenseState: "Assam",
+    };
 
     try {
       const response = await fetch("/api/ai/permit-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          destinationState: permitDestState,
-          vehicleCategory: "10-wheel Heavy Freight Multi-Axle",
-          cargoCategory: "High Value Agro-Perishables & MSME Goods",
-          driverLicenseState: "Assam",
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      setAiPermitResult(data);
-    } catch (err) {
-      console.error("AI permit check error:", err);
+      if (response.ok) {
+        const data = await response.json();
+        setAiPermitResult(data);
+      } else {
+        setAiPermitResult(generateClientPermitAssistant(payload));
+      }
+    } catch {
+      // Graceful fallback for static hosting / GitHub Pages
+      setAiPermitResult(generateClientPermitAssistant(payload));
     } finally {
       setIsCheckingPermits(false);
     }
