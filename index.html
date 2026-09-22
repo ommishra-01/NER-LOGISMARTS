@@ -13,7 +13,29 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function() {
+        var isStatic = window.location.hostname.endsWith("github.io") || window.location.protocol === "file:";
+        if (isStatic) {
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.crossOrigin = "";
+          link.href = "./assets/app.css";
+          document.head.appendChild(link);
+
+          var script = document.createElement("script");
+          script.type = "module";
+          script.crossOrigin = "";
+          script.src = "./assets/app.js";
+          document.body.appendChild(script);
+        } else {
+          var script = document.createElement("script");
+          script.type = "module";
+          script.src = "/src/main.tsx";
+          document.body.appendChild(script);
+        }
+      })();
+    </script>
   </body>
 </html>
 

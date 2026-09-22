@@ -10,11 +10,32 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script type="module" crossorigin src="./assets/index-BCWV1KLv.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-D7ALpNnT.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function() {
+        var isStatic = window.location.hostname.endsWith("github.io") || window.location.protocol === "file:";
+        if (isStatic) {
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.crossOrigin = "";
+          link.href = "./assets/app.css";
+          document.head.appendChild(link);
+
+          var script = document.createElement("script");
+          script.type = "module";
+          script.crossOrigin = "";
+          script.src = "./assets/app.js";
+          document.body.appendChild(script);
+        } else {
+          var script = document.createElement("script");
+          script.type = "module";
+          script.src = "/src/main.tsx";
+          document.body.appendChild(script);
+        }
+      })();
+    </script>
   </body>
 </html>
 
