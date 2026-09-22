@@ -133,15 +133,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    // Center on North East India (Assam / Meghalaya / Nagaland junction)
-    const map = L.map(mapContainerRef.current, {
-      center: [25.8, 93.1],
-      zoom: 7.5,
-      minZoom: 5.5,
-      maxZoom: 18,
-      zoomControl: false,
-      attributionControl: true,
-    });
+    // Reset any stale leaflet id to prevent "Map container is already initialized" crash
+    if ((mapContainerRef.current as any)._leaflet_id) {
+      delete (mapContainerRef.current as any)._leaflet_id;
+    }
+
+    let map: L.Map;
+    try {
+      // Center on North East India (Assam / Meghalaya / Nagaland junction)
+      map = L.map(mapContainerRef.current, {
+        center: [25.8, 93.1],
+        zoom: 7.5,
+        minZoom: 5.5,
+        maxZoom: 18,
+        zoomControl: false,
+        attributionControl: true,
+      });
+    } catch (e) {
+      console.warn("Leaflet initialization warning:", e);
+      return;
+    }
 
     // Place Zoom Control bottom-right to keep top and sides 100% open
     L.control.zoom({ position: "bottomright" }).addTo(map);
